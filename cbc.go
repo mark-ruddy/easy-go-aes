@@ -1,6 +1,8 @@
 package aes
 
 import (
+	"fmt"
+
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
@@ -23,7 +25,11 @@ func AesEncryptCBC(orig string, key string) (string, error) {
 
 	cryted := make([]byte, len(origData))
 
+	if len(cryted) < len(origData) {
+		return "", fmt.Errorf("encrypt input not full blocks")
+	}
 	blockMode.CryptBlocks(cryted, origData)
+
 	return base64.StdEncoding.EncodeToString(cryted), nil
 }
 
@@ -42,6 +48,9 @@ func AesDecryptCBC(cryted string, key string) (string, error) {
 
 	orig := make([]byte, len(crytedByte))
 
+	if len(orig) < len(crytedByte) {
+		return "", fmt.Errorf("decrypt input not full blocks")
+	}
 	blockMode.CryptBlocks(orig, crytedByte)
 
 	unpaddedOrig := PKCS7UnPadding(orig)
