@@ -1,3 +1,3 @@
-module github.com/mark-ruddy/easy-go-aes
+module github.com/mark-ruddy/easygoaes
 
 go 1.16
