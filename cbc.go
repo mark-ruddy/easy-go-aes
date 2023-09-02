@@ -6,11 +6,14 @@ import (
 	"encoding/base64"
 )
 
-func AesEncryptCBC(orig string, key string) string {
+func AesEncryptCBC(orig string, key string) (string, error) {
 	origData := []byte(orig)
 	k := []byte(key)
 
-	block, _ := aes.NewCipher(k)
+	block, err := aes.NewCipher(k)
+	if err != nil {
+		return "", err
+	}
 
 	blockSize := block.BlockSize()
 
@@ -21,14 +24,17 @@ func AesEncryptCBC(orig string, key string) string {
 	cryted := make([]byte, len(origData))
 
 	blockMode.CryptBlocks(cryted, origData)
-	return base64.StdEncoding.EncodeToString(cryted)
+	return base64.StdEncoding.EncodeToString(cryted), nil
 }
 
-func AesDecryptCBC(cryted string, key string) string {
+func AesDecryptCBC(cryted string, key string) (string, error) {
 	crytedByte, _ := base64.StdEncoding.DecodeString(cryted)
 	k := []byte(key)
 
-	block, _ := aes.NewCipher(k)
+	block, err := aes.NewCipher(k)
+	if err != nil {
+		return "", err
+	}
 
 	blockSize := block.BlockSize()
 
@@ -38,6 +44,9 @@ func AesDecryptCBC(cryted string, key string) string {
 
 	blockMode.CryptBlocks(orig, crytedByte)
 
-	orig = PKCS7UnPadding(orig)
-	return string(orig)
+	unpaddedOrig := PKCS7UnPadding(orig)
+	if unpaddedOrig != nil {
+		orig = unpaddedOrig
+	}
+	return string(orig), nil
 }
