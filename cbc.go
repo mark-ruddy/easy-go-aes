@@ -25,7 +25,7 @@ func AesEncryptCBC(orig string, key string) (string, error) {
 
 	cryted := make([]byte, len(origData))
 
-	if len(cryted) < len(origData) {
+	if len(cryted) < len(origData) || len(cryted) % blockSize != 0 {
 		return "", fmt.Errorf("encrypt input not full blocks")
 	}
 	blockMode.CryptBlocks(cryted, origData)
@@ -48,7 +48,7 @@ func AesDecryptCBC(cryted string, key string) (string, error) {
 
 	orig := make([]byte, len(crytedByte))
 
-	if len(orig) < len(crytedByte) {
+	if len(orig) < len(crytedByte) || len(orig) % blockSize != 0 {
 		return "", fmt.Errorf("decrypt input not full blocks")
 	}
 	blockMode.CryptBlocks(orig, crytedByte)
